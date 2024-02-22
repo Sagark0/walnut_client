@@ -7,19 +7,18 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Paper from '@mui/material/Paper'
-import { Transaction } from '../types'
 import { categories } from '../constants/menuItems'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
+import { RootState } from '../redux/store'
 
-interface TransactionCardProps {
-  transactions?: Transaction[]
-  setTransactions?: any
-}
-function TransactionTable({ transactions, setTransactions }: TransactionCardProps) {
+
+function TransactionTable() {
+  const filteredTransactions = useSelector((state: RootState) => state.transactions.filteredTransactions)
   const [visibleRows, setVisibleRows] = useState<number>(10)
   return (
     <>
-      {transactions && (
+      {filteredTransactions && (
         <TableContainer component={Paper} sx={{ width: '80%', height: '70vh' }}>
           <Table aria-label='simple table'>
             <TableHead>
@@ -31,7 +30,7 @@ function TransactionTable({ transactions, setTransactions }: TransactionCardProp
               </TableRow>
             </TableHead>
             <TableBody>
-              {transactions.slice(0, visibleRows).map(transaction => (
+              {filteredTransactions.slice(0, visibleRows).map(transaction => (
                 <TableRow
                   key={transaction.transaction_id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
@@ -57,7 +56,7 @@ function TransactionTable({ transactions, setTransactions }: TransactionCardProp
               ))}
             </TableBody>
           </Table>
-          {visibleRows < transactions?.length && (
+          {visibleRows < filteredTransactions?.length && (
             <Button onClick={() => setVisibleRows(prev => prev + 10)} sx={{ mx: 'auto', display: 'block'}}>Show More..</Button>
           )}
         </TableContainer>

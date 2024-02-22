@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import axios from 'axios'
-
-
-
+import { useDispatch } from 'react-redux'
+import { updateTransactions } from './redux/transaction/transactionSlice'
 import TransactionCard from './components/transactionCard'
-import { Transaction } from './types'
-import Visualisation from './components/visulalisation'
-import TransactionTable from './components/table'
+import Visualisation from './pages/summary'
+import TransactionTable from './pages/allTransactions'
 import Layout from './layout'
 
 function App() {
-  const [transactions, setTransactions] = useState<Transaction[]>()
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>()
   const [isFetchingMails, setIsFetchingMails] = useState<boolean>(false)
   const [isFetchingTransactions, setIsFetchingTransactions] = useState<boolean>()
+  const dispatch = useDispatch()
 
   // Hook for getting transactions
   useEffect(() => {
@@ -22,13 +19,10 @@ function App() {
     // handleRefresh();
   }, [])
 
-
-
   const getTransactions = () => {
     setIsFetchingTransactions(true)
     axios.get('http://127.0.0.1:8000/transactions/getMails/').then(res => {
-      setTransactions(res.data)
-      setFilteredTransactions(res.data)
+      dispatch(updateTransactions(res.data))
       setIsFetchingTransactions(false)
     })
   }
@@ -46,37 +40,26 @@ function App() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: (
-        <Layout transactions={transactions} filteredTransactions={filteredTransactions} setFilteredTransactions={setFilteredTransactions} isFetchingMails={isFetchingMails} handleRefresh={handleRefresh}/>
-      ),
+      element: <Layout isFetchingMails={isFetchingMails} handleRefresh={handleRefresh} />,
       children: [
         {
           path: '/',
-          element: (
-            <TransactionCard
-              transactions={filteredTransactions?.slice(0, 6)}
-              setTransactions={setTransactions}
-              isFetchingTransactions={isFetchingTransactions}
-            />
-          ),
+          element: <TransactionCard isFetchingTransactions={isFetchingTransactions} />,
         },
         {
           path: '/allTransactions',
-          element: (
-            <TransactionTable transactions={filteredTransactions} setTransactions={setTransactions} />
-          ),
+          element: <TransactionTable />,
         },
         {
           path: '/summary',
-          element: <Visualisation filteredTransactions={filteredTransactions} />,
+          element: <Visualisation />,
         },
-      ]
+      ],
     },
   ])
   return (
     <>
-          <RouterProvider router={router} />
-      
+      <RouterProvider router={router} />
     </>
   )
 }

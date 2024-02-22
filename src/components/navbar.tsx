@@ -115,11 +115,8 @@ function Navbar() {
         </Typography>
         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           {pages.map(page => (
-            <NavLink to={page.link}>
-              <Button
-                key={page.link}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}>
+            <NavLink to={page.link} key={page.link}>
+              <Button onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }} >
                 {page.label}
               </Button>
             </NavLink>

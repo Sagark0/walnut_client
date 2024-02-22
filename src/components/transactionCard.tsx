@@ -1,21 +1,21 @@
 import axios from 'axios'
-import { Transaction } from '../types'
+import { RootState } from '../redux/store'
 import { Avatar, Box, Card, Divider, Skeleton, Typography } from '@mui/material'
 import { categories } from '../constants/menuItems'
 import { SelectChangeEvent } from '@mui/material/Select'
 import SetCategory from './setCategory'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateTransactions } from '../redux/transaction/transactionSlice'
 
 interface TransactionCardProps {
-  transactions?: Transaction[]
-  setTransactions?: any
   isFetchingTransactions?: boolean
 }
 
-function TransactionCard({
-  transactions,
-  setTransactions,
-  isFetchingTransactions,
-}: TransactionCardProps) {
+function TransactionCard({ isFetchingTransactions }: TransactionCardProps) {
+  const dispatch = useDispatch()
+  const {transactions, filteredTransactions} = useSelector(
+    (state: RootState) => state.transactions,
+  )
   const handleCategoryChange = (event: SelectChangeEvent, transaction_id: number) => {
     console.log(event.target.value, transaction_id)
     axios
@@ -34,14 +34,14 @@ function TransactionCard({
       }
       return transaction
     })
-    setTransactions(updatedTransaction)
+    dispatch(updateTransactions(updatedTransaction))
   }
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
       <Typography variant='overline'>Recent Transactions</Typography>
-      {transactions &&
-        transactions.map(transaction => (
+      {filteredTransactions &&
+        filteredTransactions.map(transaction => (
           <>
             {isFetchingTransactions ? (
               <LoadingSkeleton />

@@ -1,15 +1,16 @@
 import { Chart } from 'react-google-charts'
 import { Transaction } from '../types'
 import { Paper } from '@mui/material'
+import { RootState } from '../redux/store'
+import { useSelector } from 'react-redux'
 
 export const options = {
   title: 'Categories wise Monthly Distribution',
   is3D: true,
 }
-interface VisualisationCardProps {
-  filteredTransactions?: Transaction[]
-}
-function Visualisation({ filteredTransactions }: VisualisationCardProps) {
+
+function Visualisation() {
+  const filteredTransactions = useSelector((state: RootState) => state.transactions.filteredTransactions)
   console.log('filtereddata', filteredTransactions)
   const dataMap = new Map()
   filteredTransactions?.forEach((transaction: Transaction) => {

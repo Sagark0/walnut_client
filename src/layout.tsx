@@ -6,24 +6,20 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 
 import TransactionFilter from './components/transactionFilter'
 import { Transaction } from './types'
+import { useSelector } from 'react-redux'
+import { RootState } from './redux/store'
 
 interface LayoutProps {
-  transactions?: Transaction[]
-  filteredTransactions?: Transaction[]
-  setFilteredTransactions?: any
   isFetchingMails?: boolean
   handleRefresh: any
 }
 
 function Layout({
-  transactions,
-  filteredTransactions,
-  setFilteredTransactions,
   isFetchingMails,
   handleRefresh,
 }: LayoutProps) {
   const [totalAmount, setTotalAmount] = useState<number>()
-
+  const filteredTransactions = useSelector((state: RootState) => state.transactions.filteredTransactions)
   // Hook for calculating total monthly amount
   useEffect(() => {
     let sum: number | undefined = filteredTransactions?.reduce(
@@ -38,7 +34,16 @@ function Layout({
   return (
     <>
       <Navbar />
-      <Paper elevation={0} sx={{ m: 2, p: 2, borderRight: '1px solid', borderLeft: '1px solid', borderBottom: '2px solid', borderColor: 'secondary.main' }}>
+      <Paper
+        elevation={0}
+        sx={{
+          m: 2,
+          p: 2,
+          borderRight: '1px solid',
+          borderLeft: '1px solid',
+          borderBottom: '2px solid',
+          borderColor: 'secondary.main',
+        }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
             Total Spent: ₹ {totalAmount?.toLocaleString('en-IN')}
@@ -47,8 +52,6 @@ function Layout({
             </IconButton>
           </Box>
           <TransactionFilter
-            transactions={transactions}
-            setFilteredTransactions={setFilteredTransactions}
           />
         </Box>
         <Box

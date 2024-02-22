@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../redux/store'
+import { setFilteredTransactions } from '../redux/transaction/transactionSlice'
 import ListItemText from '@mui/material/ListItemText'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import InputLabel from '@mui/material/InputLabel'
@@ -6,7 +9,6 @@ import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import Checkbox from '@mui/material/Checkbox'
-import { Transaction } from '../types'
 import { categories } from '../constants/menuItems'
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
@@ -19,22 +21,20 @@ const MenuProps = {
   },
 }
 
-interface TransactionCardProps {
-  transactions?: Transaction[]
-  setFilteredTransactions?: any
-}
-
-function TransactionFilter({ transactions, setFilteredTransactions }: TransactionCardProps) {
+function TransactionFilter() {
+  const dispatch = useDispatch()
+  const { transactions } = useSelector((state: RootState) => state.transactions)
   const [transactionCategory, setTransactionCategory] = useState<string[]>(
     Object.values(categories).map(c => c.category_id),
   )
-
   useEffect(() => {
     const filtered = transactions?.filter(transaction =>
       transactionCategory.includes(transaction.category),
     )
-    setFilteredTransactions(filtered)
-  }, [transactions, transactionCategory])
+    console.log("t", transactionCategory)
+    console.log("f", filtered)
+    dispatch(setFilteredTransactions(filtered))
+  }, [transactionCategory])
 
   const handleChange = (event: SelectChangeEvent<typeof transactionCategory>) => {
     const {
