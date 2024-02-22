@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux/store'
-import { setFilteredTransactions } from '../redux/transaction/transactionSlice'
+import { setFilteredTransactions, updateMonth, updateYear } from '../redux/transaction/transactionSlice'
 import ListItemText from '@mui/material/ListItemText'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import InputLabel from '@mui/material/InputLabel'
@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem'
 import FormControl from '@mui/material/FormControl'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import Checkbox from '@mui/material/Checkbox'
-import { categories } from '../constants/menuItems'
+import { categories, months, years } from '../constants/menuItems'
 const ITEM_HEIGHT = 48
 const ITEM_PADDING_TOP = 8
 const MenuProps = {
@@ -23,7 +23,8 @@ const MenuProps = {
 
 function TransactionFilter() {
   const dispatch = useDispatch()
-  const { transactions } = useSelector((state: RootState) => state.transactions)
+  const { transactions, filter } = useSelector((state: RootState) => state.transactions)
+  const { month, year } = filter
   const [transactionCategory, setTransactionCategory] = useState<string[]>(
     Object.values(categories).map(c => c.category_id),
   )
@@ -31,12 +32,18 @@ function TransactionFilter() {
     const filtered = transactions?.filter(transaction =>
       transactionCategory.includes(transaction.category),
     )
-    console.log("t", transactionCategory)
-    console.log("f", filtered)
+    console.log('t', transactionCategory)
+    console.log('f', filtered)
     dispatch(setFilteredTransactions(filtered))
   }, [transactionCategory])
 
-  const handleChange = (event: SelectChangeEvent<typeof transactionCategory>) => {
+  const handleMonthChange = (event: SelectChangeEvent) => {
+    dispatch(updateMonth(event.target.value))
+  }
+  const handleYearChange = (event: SelectChangeEvent) => {
+    dispatch(updateYear(event.target.value))
+  }
+  const handleCategoryChange = (event: SelectChangeEvent<typeof transactionCategory>) => {
     const {
       target: { value },
     } = event
@@ -48,6 +55,48 @@ function TransactionFilter() {
 
   return (
     <>
+        {/* Month Filter */}
+      <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <InputLabel id='demo-multiple-chip-label'>Month</InputLabel>
+        <Select
+          labelId='demo-simple-select-label'
+          id='demo-simple-select'
+          value={month}
+          label='Month'
+          onChange={handleMonthChange}>
+          {months.map((month, index) => (
+            <MenuItem value={index + 1} key={month}>
+              {month}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+        {/* Year Filter */}
+      <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <InputLabel id='demo-multiple-chip-label'>Year</InputLabel>
+        <Select
+          labelId='demo-simple-select-label'
+          id='demo-simple-select'
+          value={year}
+          label='Year'
+          onChange={handleYearChange}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 200, // Adjust the max height as needed
+              },
+            },
+          }}>
+          {years.map((year) => (
+            <MenuItem value={year} key={year}>
+              {year}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      
+        {/* Category Filter */}
       <FormControl sx={{ m: 1, width: 500 }}>
         <InputLabel id='demo-multiple-chip-label'>Categories</InputLabel>
         <Select
@@ -55,7 +104,7 @@ function TransactionFilter() {
           id='demo-multiple-chip'
           multiple
           value={transactionCategory}
-          onChange={handleChange}
+          onChange={handleCategoryChange}
           input={<OutlinedInput label='Category' />}
           renderValue={selected => selected.join(', ')}
           MenuProps={MenuProps}>

@@ -14,12 +14,11 @@ interface LayoutProps {
   handleRefresh: any
 }
 
-function Layout({
-  isFetchingMails,
-  handleRefresh,
-}: LayoutProps) {
+function Layout({ isFetchingMails, handleRefresh }: LayoutProps) {
   const [totalAmount, setTotalAmount] = useState<number>()
-  const filteredTransactions = useSelector((state: RootState) => state.transactions.filteredTransactions)
+  const filteredTransactions = useSelector(
+    (state: RootState) => state.transactions.filteredTransactions,
+  )
   // Hook for calculating total monthly amount
   useEffect(() => {
     let sum: number | undefined = filteredTransactions?.reduce(
@@ -51,8 +50,7 @@ function Layout({
               <RefreshIcon fontSize='small' />
             </IconButton>
           </Box>
-          <TransactionFilter
-          />
+          <TransactionFilter />
         </Box>
         <Box
           sx={{
